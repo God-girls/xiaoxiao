@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<meta http-equiv="pragma" content="no-cache" />
+<meta http-equiv="cache-control" content="no-cache" />
+<meta http-equiv="expires" content="0" />
+
+<title></title>
+<!-- <link rel="stylesheet" href="/increment/public/css/reward.css"> -->
+<style type="text/css">
+*{
+    margin: 0;padding: 0;
+}
+
+</style>
+</head>
+<body>
+<pre id="output"></pre>
+<div >
+    <canvas id="canvas" width="1054" height="1096" ></canvas>
+</div>
+
+<script src='/test/js/jquery.js'></script> 
+<script src='/test/js/ocanvas-2.8.3.min.js'></script>
+
+<script type='text/javascript'>
+
+$(function () {
+// function output (label, input) {
+//         var out = document.getElementById("output"),
+//             input_string = "", i, number;
+//         if (typeof input === "object") {
+//             input_string += "{\n";
+//             for (i in input) {
+//                 number = !isNaN(parseFloat(input[i])) ? true : false;
+//                 input_string += "<span class=\"tab\">\t</span>" + i + ": " + (number ? "" : "\"") + input[i] + (number ? "" : "\"") + "\n";
+//             }
+//             input_string += "}\n";
+//         }
+//         out.innerHTML += (out.innerHTML === "" ? "" : "\n") + label + input_string;
+//     }
+    
+    var c = document.querySelector("#canvas"),
+        ctx = c.getContext("2d");
+
+    c.width = window.innerWidth;
+    c.height = window.innerHeight;
+    c.addEventListener("touchmove", function (e) { e.preventDefault(); }, false);
+    
+    
+    
+var canvas = oCanvas.create({
+    canvas: "#canvas",
+    background: "#222",
+    fps: 60
+});
+
+var data = [25, 55, 10,10];
+
+var prototype = canvas.display.arc({
+    x: canvas.width / 2,
+    y: canvas.height / 2,
+    radius: 150,
+    pieSection: true
+});
+
+var pieces = [], end, lastEnd;
+for (var i = 0; i < data.length; i++) {
+    end = (i > 0 ? lastEnd : 0) + 360 / (100 / data[i]) - (i < 1 ? 90 : 0);
+    
+    console.log(end)
+
+    pieces.push(prototype.clone({
+        start: (i < 1 ? -90 : lastEnd),
+        end: end,
+        fill: "hsl(195, "+ (100 - i*10) +"%, "+ (50 - i*10) +"%)"
+    }));
+
+    canvas.addChild(pieces[i]);
+    lastEnd = end;
+
+    pieces[i]._start = pieces[i].start;
+    pieces[i]._end = pieces[i].end;
+
+    pieces[i].bind("mouseenter touchenter", function () {
+        this.radius = 154;
+        canvas.redraw();
+    }).bind("mouseleave touchleave", function () {
+        this.radius = 150;
+        canvas.redraw();
+    }).bind("click tap", function () {
+        for (var i = 0; i < pieces.length; i++) {
+            pieces[i].animate({
+                start: 0,
+                end: 0,
+                opacity: 0
+            }, 500, function () {
+                this.animate({
+                    start: this._start,
+                    end: this._end,
+                    opacity: 1
+                }, 500);
+            });
+        }
+    });
+}//end for 循环
+
+
+});//end ready
+
+
+
+</script>
+</body>
+</html>

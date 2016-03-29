@@ -1,0 +1,127 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="format-detection"content="telephone=no, email=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+<meta name="format-detection" content="telphone=no, email=no" />
+<meta name="renderer" content="webkit">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="HandheldFriendly" content="true">
+<meta name="MobileOptimized" content="320">
+<meta name="screen-orientation" content="portrait">
+<meta name="x5-orientation" content="portrait">
+<meta name="full-screen" content="yes">
+<meta name="x5-fullscreen" content="true">
+<meta name="browsermode" content="application">
+<meta name="x5-page-mode" content="app">
+<meta name="msapplication-tap-highlight" content="no">
+<meta http-equiv="pragma" content="no-cache" />
+<meta http-equiv="cache-control" content="no-cache" />
+<meta http-equiv="expires" content="0" />
+
+<title></title>
+
+
+
+</head>
+<body>
+
+
+
+<script src='/test/js/jquery.js'></script>
+<script type="text/javascript" >
+    $(function () {
+    var html = {
+        getValueString: function(str, name) {
+            var reg = new RegExp("(^|&)"+name+"=([^&\n]*)(&|\n|$)");
+            var r = str.match(reg);
+            if (r!=null) return escape(r[2]); return null;
+        },
+        getQueryValue : function(name) {
+            return html.getValueString(window.location.search.substr(1), name);
+        }
+    }
+      var keynum = html.getQueryValue('keynum'),
+          wlanusermac = html.getQueryValue('wlanusermac'),
+          wlanssid = html.getQueryValue('wlanssid'),
+          wlanapmac = html.getQueryValue('wlanapmac');
+        //判断访问终端
+        var browser = {
+            versions: function () {
+                var u = navigator.userAgent, app = navigator.appVersion;
+                return {
+                    trident: u.indexOf('Trident') > -1, //IE内核
+                    presto: u.indexOf('Presto') > -1, //opera内核
+                    webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+                    gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+                    mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+                    ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+                    android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+                    iPhone: u.indexOf('iPhone') > -1, //是否为iPhone或者QQHD浏览器
+                    iPad: u.indexOf('iPad') > -1, //是否iPad
+                    webApp: u.indexOf('Safari') == -1 //是否web应该程序，没有头部与底部
+                };
+            }(),
+            language: (navigator.browserLanguage || navigator.language).toLowerCase()
+        }
+        $.ajax({
+            url: 'http://192.168.66.157:18085/?index',
+            dataType:"jsonp",
+            jsonp:"jsonpcallback",
+            contentType: "application/json;utf-8",
+            beforeSend:function(){ 
+            alert('go')      
+            },
+            complete:function(){
+                alert('end')
+            }, 
+            error:function(msg){
+                alert('err')
+                alert(msg)
+            },    
+            success: function (json) {
+                if (json.success) {
+                    window.location.href = 'http://auth.wi2o.cn:18085/remote_manage?op=remote_login_v2&wlanusermac=' + wlanusermac + '&wlanapmac=' + wlanapmac + '&tok=';
+                    alert(0)
+                }
+                else {
+                    //判断是否移动端
+                    alert(1)
+                    if (browser.versions.mobile || browser.versions.android || browser.versions.ios) {
+                        // window.location.href = 'index.html?wlanusermac='+wlanusermac+'&wlanapmac='+wlanapmac+'&wlanssid='+wlanssid;
+                        alert(2)
+                    } else {
+                        // window.location.href = 'index_pc.html?wlanusermac='+wlanusermac+'&wlanapmac='+wlanapmac+'&wlanssid='+wlanssid;
+                        alert(3)
+                    }
+                }
+            }
+        });
+
+        $.ajax({
+            url:'http://www.bhuwifi.com/ucloud/getcomments',
+            async: false,
+            dataType:"jsonp",
+            jsonp:"jsonpcallback",
+            contentType: "application/json;utf-8",     
+            success:function(json){
+                console.log(json);
+                alert('我是评论')
+            }
+        });
+
+
+
+
+
+
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<meta http-equiv="pragma" content="no-cache" />
+<meta http-equiv="cache-control" content="no-cache" />
+<meta http-equiv="expires" content="0" />
+
+<title></title>
+<!-- <link rel="stylesheet" href="/increment/public/css/reward.css"> -->
+<style type="text/css">
+*{
+    margin: 0;padding: 0;
+}
+
+</style>
+</head>
+<body>
+
+<div >
+    <canvas id="canvas" width="854" height="796" ></canvas>
+</div>
+
+<script src='/test/js/jquery.js'></script> 
+<script src='/test/js/ocanvas-2.8.3.min.js'></script>
+
+<script type='text/javascript'>
+oCanvas.domReady(function () {
+var constructor = function (settings, core) {
+    
+    return oCanvas.extend({
+        core: core,
+        
+        shapeType: "rectangular",
+
+        init: function () {
+            
+        },
+
+        draw: function () {
+            var canvas = this.core.canvas,
+                origin = this.getOrigin(),
+                x = this.abs_x - origin.x,
+                y = this.abs_y - origin.y,
+                width = this.width,
+                height = this.height;
+                
+            canvas.beginPath();
+            
+            if (this.fill !== "") {
+                canvas.fillStyle = this.fill;//设置或返回用于填充绘画的颜色、渐变或模式
+                canvas.fillRect(x, y, width, height);//绘制“被填充”的矩形
+            }
+            
+            if (this.strokeWidth > 0) {
+                canvas.strokeStyle = this.strokeColor;
+                canvas.lineWidth = this.strokeWidth;
+                canvas.strokeRect(x, y, width, height);//绘制矩形（无填充）
+            }
+            
+            canvas.closePath();
+        }
+    }, settings);
+};
+
+oCanvas.registerDisplayObject("myObject", constructor, "init");
+
+var plugin = function () {
+    this.background.set("#ff0");
+};
+
+oCanvas.registerPlugin("myPlugin", plugin);
+
+var canvas = oCanvas.create({
+    canvas: "#canvas",
+    background: "#ccc",
+    plugins: ["myPlugin"]
+});
+
+var myObj = canvas.display.myObject({
+    x: 550,
+    y: 200,
+    origin: { x: "center", y: "center" },
+    width: 200,
+    height: 200,
+    fill: "#000",
+    stroke: "10px #fff",
+    currentPosition: "top"
+});
+// var rectangle = canvas.display.rectangle({
+//     x: 377,
+//     y: 74,
+//     width: 200,
+//     height: 100,
+//     fill: "#000"
+// });
+
+canvas.addChild(myObj);
+
+
+// canvas.addChild(rectangle);
+
+// rectangle.bind("click tap", function () {
+//     canvas.removeChild(rectangle);
+// });
+// myObj.fill = "#ff0000";
+
+// myObj.bind("click tap", function () {
+//     canvas.redraw();
+// });
+
+// var rectangle = canvas.display.rectangle({
+//     x: 377,
+//     y: 100,
+//     width: 200,
+//     height: 100,
+//     fill: "#000"
+// });
+
+// var square = canvas.display.rectangle({
+//     x: 10,
+//     y: 10,
+//     width: 50,
+//     height: 50,
+//     fill: "#0ff"
+// });
+
+// canvas.addChild(rectangle);
+
+// rectangle.addChild(square);
+
+var arc = canvas.display.arc({
+    x: 177,
+    y: 160,
+    radius: 80,
+    start: 110,
+    end: -10,
+    stroke: "10px #0aa"
+});
+
+canvas.addChild(arc);
+
+var arc1 = canvas.display.arc({
+    x: 377,
+    y: 260,
+    radius: 80,
+    start: 110,
+    end: 0,
+    fill: "#0aa"
+});
+
+canvas.addChild(arc1);
+
+var arc2 = canvas.display.arc({
+    x: 177,
+    y: 460,
+    radius: 80,
+    start: 110,
+    end: -10,
+    fill: "#0aa",
+    pieSection: true
+});
+
+canvas.addChild(arc2);
+
+
+
+var line = canvas.display.line({
+    start: { x: 80, y: 60 },
+    end: { x: 280, y: 170 },
+    stroke: "20px #0aa",
+    cap: "round"
+});
+
+canvas.addChild(line);
+
+var triangle = canvas.display.polygon({
+    x: 377,
+    y: 145,
+    sides: 5,
+    radius: 80,
+    rotation: 90,
+    fill: "#ff0000"
+});
+
+
+
+var sprite = canvas.display.sprite({
+    x: 177,
+    y: 137,
+    origin: { x: "center", y: "center" },
+    image: "http://ocanvas.org/img/sprite.png",
+    generate: true,
+    width: 20,
+    height: 20,
+    direction: "x",
+    duration: 60,
+    frame:1
+});
+canvas.addChild(sprite);
+sprite.startAnimation();
+sprite.bind("click tap", function () {
+    this.stopAnimation();
+});
+
+canvas.setLoop(function () {
+    triangle.rotation++;
+    satellite.rotation += 0.5
+}).start();
+
+triangle.bind("click tap", function () {
+    canvas.timeline.stop();
+});
+
+
+// myObj.bind("touchstart", function () {
+//     canvas.touch.cancel();
+//     myObj.fill = "#f00";
+//     canvas.redraw();
+//     console.log(222)
+// }).bind("tap", function () {
+    
+//     myObj.fill = "#00f";
+//     canvas.redraw();
+//     console.log(111)
+// });
+
+
+var text = canvas.display.text({
+    x: 377,
+    y: 340,
+    origin: { x: "center", y: "top" },
+    align: "center",
+    font: "bold 25px/1.5 sans-serif",
+    text: "Is the finger inside\nthe canvas?\nNo",
+    fill: "#000"
+});
+
+
+var menu = canvas.scenes.create("menu", function () {
+    this.add(text);
+});
+
+menu.add(triangle);
+// canvas.addChild(triangle);
+
+canvas.scenes.load("menu");
+
+
+
+
+// canvas.setLoop(function () {
+//     text.text = "Is the finger inside\nthe canvas?\n" +
+//             (canvas.touch.onCanvas() ? "Yes" : "No");
+// }).start();
+
+
+// myObj.dragAndDrop({
+//     start: function () {
+//         this.fill = "#ff0";
+//     },
+//     move: function () {
+//         this.fill = "#0f0";
+//     },
+//     end: function () {
+//         this.fill = "#f00";
+//     }
+// });
+
+
+
+// myObj.bind("update-color", function handler (event) {
+//     var eventObject = event.originalEvent;
+//     var color = eventObject ? eventObject.color :
+//         "hsl(" + Math.random() * 360 + ", 50%, 50%)";
+//     this.fill = color;
+//     canvas.redraw();
+//     console.log(123)
+// });
+
+// myObj.bind("click tap", function () {
+//     this.trigger("update-color");
+// });
+
+// myObj.bind("dblclick dbltap", function () {
+//     this.trigger("update-color", {color: "#000"});
+// });
+
+
+// myObj.bind("click tap", function () {
+
+//     // Stop any currently running animations
+//     this.stop();
+
+//     // Animate rotation, using queue="rotation"
+//     this.animate({
+//         rotation: this.currentPosition === "top" ? 360 : 0
+//     }, {
+//         easing: "ease-in-out-cubic",
+//         queue: "rotation"
+//     });
+
+//     // Animate movement, using queue="move"
+//     this.animate({
+//         y: this.currentPosition === "top" ? 400 : 200
+//     }, {
+//         easing: "ease-in-out-cubic",
+//         queue: "move"
+//     });
+
+//     // Toggle the position for next click
+//     this.currentPosition = this.currentPosition === "top" ? "bottom" : "top";
+// });
+
+myObj.bind("click tap", function () {
+    this.finish();
+    this.fill = "#0f0";
+    canvas.redraw();
+
+    this.animate({
+        rotation: this.rotation + 180
+    });
+    // this.delay(500);
+    this.animate({
+        rotation: this.rotation + 360
+    }, {
+        callback: function () {
+            this.fill = "#f00";
+            canvas.redraw();
+        }
+    });
+});
+
+
+
+var center = canvas.display.ellipse({
+    x: canvas.width / 2, y: canvas.height / 2,
+    radius: canvas.width / 60,
+    fill: "#fff"
+}).add();
+
+
+var pathProto = canvas.display.ellipse({ stroke: "1px #999" });
+var satelliteProto = canvas.display.polygon({ fill: "#eee" });
+var satelliteColors = ["#107B99", "#5F92C0", "#c7509f"];
+    // Create the path that the satellite will follow
+    var path = pathProto.clone({
+        radius: canvas.width / 30,
+        x: 0, y: 0,
+        strokeColor: '#666'
+    });
+    center.addChild(path);
+
+    var satellite = satelliteProto.clone({
+        origin: {
+            x: 0,
+            y: canvas.width / 30 * (Math.round(Math.random()) ? 1 : -1)
+        },
+        speed: 0.5,
+        sides: 5,
+        radius: canvas.width / 100,
+        x: 0, y: 0,
+        fill: "#107B99",
+        rotation: Math.random() * 360
+    });
+    center.addChild(satellite);
+    
+    //satellites.push(satellite);
+
+// var triangle = canvas.display.polygon({
+//     x: 377,
+//     y: 145,
+//     sides: 5,
+//     radius: 80,
+//     rotation: 90,
+//     fill: "#ff0000"
+// });
+
+
+});
+
+
+
+
+
+</script>
+</body>
+</html>
