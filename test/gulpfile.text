@@ -1,0 +1,142 @@
+资料参考：http://www.w3ctrain.com/2015/12/22/gulp-for-beginners/  
+
+1、在安装 node 的环境后：
+
+npm install gulp -g 全局安装
+npm install --save-dev gulp gulp-ruby-saaa gulp-autoprefixer gulp-minify-css gulp-htmlmin gulp-uglify gulp-imagemin gulp-rename gulp-cancat gulp-notify gulp-cache gulp-cached gulp-livereload del gulp-useref browser-sync run-sequence;
+
+2、demo
+
+var gulp = require('gulp'),
+    sass = require('gulp-ruby-sass'),
+    autoprefixer = require('gulp-autoprefixer'),
+    minifycss = require('gulp-minify-css'),
+    htmlmin = require('gulp-htmlmin'),//html压缩
+    jshint = require('gulp-jshint'),
+    uglify = require('gulp-uglify'),
+    imagemin = require('gulp-imagemin'),
+    rename = require('gulp-rename'),
+    concat = require('gulp-concat'),
+    notify = require('gulp-notify'),
+    cache = require('gulp-cache'),
+    cached = require('gulp-cached'),
+    livereload = require('gulp-livereload'),
+    del = require('del'),
+    browserSync = require('browser-sync'),
+    useref = require('gulp-useref'),
+    runSequence = require('run-sequence');
+
+
+var jsMini = [
+    './public/src/js/pages/profit.js',
+    './public/src/js/pages/operation.js',
+    './public/src/js/pages/information.js',
+    './public/src/js/pages/import.js',
+    './public/src/js/pages/recover.js',
+    './public/src/js/pages/material.js',
+    './public/src/js/pages/mycenter.js',
+    './public/src/js/pages/master.js',
+    './public/src/js/admin/admin.js',
+    './public/src/js/admin/apply.js'
+]
+
+gulp.task('browserSync', function() {
+  browserSync({
+    proxy: "192.168.66.79:8802"
+  })
+})
+
+gulp.task('otherJs', function() {
+    jsMini.forEach(function (val) {
+      gulp.src(val)
+        .pipe(cached('otherJs'))
+        .pipe(rename({suffix: '.min'}))
+        .pipe(uglify())
+        .pipe(gulp.dest('./public/js/'))
+        .pipe(notify({ message: 'otherJs task complete' }))
+        .pipe(browserSync.reload({
+          stream: true
+        }))
+    })      
+});    
+
+gulp.task('scripts', function() {
+  gulp.src(['./public/src/js/plug_in/jquery.js','./public/src/js/plug_in/confirmBox.min.js','./public/src/js/plug_in/manage.js','./public/src/js/common.js'])
+    .pipe(cached('scripts'))
+    .pipe(concat('main.js'))
+    .pipe(rename({suffix: '.min'}))
+    .pipe(uglify())
+    .pipe(gulp.dest('./public/js/plug_in'))
+    .pipe(notify({ message: 'upload task complete' }))
+    .pipe(browserSync.reload({
+      stream: true
+    }))
+});
+
+gulp.task('login', function() {
+  return gulp.src(['./public/src/js/plug_in/jquery.js','./public/src/js/plug_in/manage.js','./public/src/js/login.js'])
+    .pipe(cached('login'))
+    .pipe(concat('login.js'))
+    .pipe(rename({suffix: '.min'}))
+    .pipe(uglify())
+    .pipe(gulp.dest('./public/js/plug_in'))
+    .pipe(notify({ message: 'login task complete' }))
+    .pipe(browserSync.reload({
+      stream: true
+    }))
+});
+
+gulp.task('css', function() {
+  gulp.src(['./public/src/css/base.css','./public/src/css/bhu.css'])
+    //.pipe(cached('css'))
+    .pipe(autoprefixer())
+    .pipe(concat('bhu.css'))
+    .pipe(minifycss())
+    .pipe(rename({suffix: '.min'}))
+    .pipe(gulp.dest('./public/css'))
+    .pipe(notify({ message: 'css base task complete' }))
+    .pipe(browserSync.reload({
+      stream: true
+    }))
+
+  gulp.src(['./public/src/css/base.css','./public/src/css/login.css'])
+    //.pipe(cached('css'))
+    .pipe(autoprefixer())
+    .pipe(concat('login.css'))
+    .pipe(minifycss())
+    .pipe(rename({suffix: '.min'}))
+    .pipe(gulp.dest('./public/css'))
+    .pipe(notify({ message: 'css login task complete' }))
+    .pipe(browserSync.reload({
+      stream: true
+    }))
+
+
+});
+
+gulp.task('jsportal', function() {
+  return gulp.src(['./public/src/portal/common.3.js','./public/src/portal/rewardapp.3.js'])
+    .pipe(concat('reward.2.1.js'))
+    // .pipe(rename({suffix: '.min'}))
+    .pipe(uglify())
+    .pipe(gulp.dest('./public/src/portal'))
+    .pipe(notify({ message: 'reward.2.1 complete' }))
+});
+
+
+gulp.task('watch', ['browserSync', 'scripts', 'css','login', 'otherJs'], function (){
+  gulp.watch('public/src/css/*.css', ['css']);
+  gulp.watch('public/src/js/pages/*.js', ['otherJs']);
+  gulp.watch('public/src/js/plug_in/*.js', ['scripts']);
+  gulp.watch('public/src/js/login.js', ['login']);
+  //gulp.watch('public/src/portal/**/*.js', ['jsportal']);
+  // Reloads the browser whenever HTML or JS files change
+  gulp.watch('resources/views/home/**/*.php', browserSync.reload);
+  gulp.watch('public/js/*.js', browserSync.reload);
+});
+
+gulp.task('default', function (callback) {
+  runSequence(['browserSync', 'scripts', 'css', 'otherJs', 'login', 'watch'],
+    callback
+  )
+})
